@@ -276,5 +276,3 @@ The project is designed to be **extensible**, **secure**, and **production-ready
 
 ---
 
-**Author:** Sai Phapale
-**Project:** DataBridge AI
