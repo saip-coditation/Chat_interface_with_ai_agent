@@ -1,234 +1,280 @@
-# DataBridge AI - AI-Driven Data Access Platform
+# DataBridge AI – Chat Interface
 
-A modern SaaS web application that allows users to connect their Stripe and Zendesk accounts and query their business data using natural language, powered by OpenAI.
+DataBridge AI is an **AI-driven data access platform** that allows users to connect third-party services like **Stripe, Zoho CRM, and GitHub**, and query their data using **natural language**.
+The system securely fetches data using official APIs and presents **summaries and visualizations** through a chat-style interface.
 
-## Features
+---
 
-- **Multi-Platform Support**: Connect Stripe and Zendesk accounts
-- **Natural Language Queries**: Ask questions about your data in plain English
-- **AI-Powered Insights**: OpenAI-powered query understanding and summarization
-- **Secure Credential Storage**: AES-256 encrypted API keys
-- **Modern UI**: Clean, responsive SaaS-style interface
+## 🚀 Project Overview
 
-## Architecture
+### What This Project Does
 
+* Connects to external platforms using user-provided credentials
+* Accepts questions in plain English
+* Makes **multiple API calls internally if required**
+* Returns a **single meaningful result** with summaries and charts
+
+### Key Principle
+
+> The system does **not store or modify any business data**.
+> It only fetches data temporarily using official APIs and user credentials.
+
+---
+
+## 🧱 Tech Stack
+
+| Layer           | Technology               |
+| --------------- | ------------------------ |
+| Frontend        | HTML, CSS, JavaScript    |
+| Backend         | Django REST Framework    |
+| AI / Reasoning  | OpenAI / Gemini          |
+| Workflow Engine | LangGraph                |
+| Platforms       | Stripe, Zoho CRM, GitHub |
+| Auth            | API Keys / OAuth Tokens  |
+
+---
+
+## 📌 Important Links & Credentials
+
+### Zoho API Console
+
+Used to manage OAuth client credentials.
+
+* **Console Link**
+  [https://api-console.zoho.in/client/1000.KIP35Q5XY5NCCSLHDHT1J4PZ9VI2BM](https://api-console.zoho.in/client/1000.KIP35Q5XY5NCCSLHDHT1J4PZ9VI2BM)
+
+* **Client ID**
+  `1000.KIP35Q5XY5NCCSLHDHT1J4PZ9VI2BM`
+
+* **Redirect URI (Local)**
+
+```text
+http://localhost:8000/api/platforms/zoho/callback/
 ```
-Chat_Interface/
-├── index.html              # Frontend SPA
-├── css/                    # Modular CSS
-│   ├── variables.css       # Design tokens
-│   ├── base.css           # Reset & utilities
-│   ├── components.css     # UI components
-│   ├── pages.css          # Page layouts
-│   └── animations.css     # Animations
-├── js/                     # Frontend JavaScript
-│   ├── utils.js           # Utility functions
-│   ├── state.js           # State management
-│   ├── api.js             # API client
-│   └── app.js             # Main controller
-└── backend/                # Django REST API
-    ├── manage.py
-    ├── requirements.txt
-    ├── config/             # Django settings
-    ├── apps/
-    │   ├── authentication/ # JWT auth
-    │   ├── platforms/      # Platform connections
-    │   └── queries/        # Query processing
-    └── utils/              # Utilities
-        ├── encryption.py   # API key encryption
-        ├── openai_client.py
-        ├── stripe_client.py
-        └── zendesk_client.py
-```
 
-## Quick Start
+---
 
-### 1. Backend Setup
+### Stripe Dashboard (Test Mode)
+
+* **Dashboard Link**
+  [https://dashboard.stripe.com/acct_1SpQgM2f4RjAwI8m/test/dashboard](https://dashboard.stripe.com/acct_1SpQgM2f4RjAwI8m/test/dashboard)
+
+* Used for:
+
+  * Viewing test transactions
+  * Managing API keys
+  * Monitoring invoices and payments
+
+---
+
+## 🔑 GitHub Personal Access Token (PAT) Guide
+
+Used for accessing GitHub repositories via API.
+
+### Steps to Generate a PAT
+
+1. Log in to GitHub: [https://github.com](https://github.com)
+2. Click profile photo → **Settings**
+3. Go to **Developer settings**
+4. Select **Personal access tokens**
+5. Choose **Tokens (classic)**
+6. Click **Generate new token (classic)**
+
+### Recommended Settings
+
+* **Name**: `DataBridge AI Token`
+* **Expiration**: 30–90 days
+* **Scopes**:
+
+  * `repo`
+  * `workflow`
+  * `read:user`
+
+⚠️ **Important**: Copy the token immediately. It cannot be viewed again.
+
+---
+
+## 🛠️ Project Setup
+
+### 1️⃣ Backend (Django REST Framework)
 
 ```bash
 cd backend
-
-# Create virtual environment
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# venv\Scripts\activate   # Windows
-
-# Install dependencies
+source venv/bin/activate
 pip install -r requirements.txt
 
-# Create .env file
 cp .env.example .env
+# Add API keys and secrets in .env
 
-# Edit .env and add your keys:
-# - SECRET_KEY (generate a new one)
-# - OPENAI_API_KEY (your OpenAI key)
-# - ENCRYPTION_KEY (generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
-
-# Run migrations
 python manage.py migrate
-
-# Create superuser (optional)
-python manage.py createsuperuser
-
-# Run server
 python manage.py runserver
 ```
 
-### 2. Frontend Setup
+Backend runs at:
 
-The frontend is static HTML/CSS/JS. You can serve it with any static file server:
+```text
+http://localhost:8000
+```
+
+---
+
+### 2️⃣ Frontend (Static SPA)
 
 ```bash
-# Option 1: Python simple server
-cd Chat_Interface
+# From project root
 python -m http.server 5500
-
-# Option 2: VS Code Live Server extension
-# Option 3: Any static file server
 ```
 
-### 3. Access the Application
+Access frontend at:
 
-- Frontend: http://localhost:5500 (or wherever you serve it)
-- Backend API: http://localhost:8000/api/
+```text
+http://localhost:5500
+```
 
-## API Endpoints
+---
 
-### Authentication
-- `POST /api/auth/login/` - Login with email/password
-- `POST /api/auth/register/` - Register new user
-- `POST /api/auth/logout/` - Logout (blacklist token)
-- `POST /api/auth/refresh/` - Refresh access token
-- `GET /api/auth/me/` - Get current user
+## 🔄 Architecture & Query Flow
 
-### Platforms
-- `GET /api/platforms/` - List connected platforms
-- `POST /api/platforms/connect/` - Connect new platform
-- `DELETE /api/platforms/{id}/` - Disconnect platform
-- `POST /api/platforms/{id}/reverify/` - Re-verify credentials
+The system uses a **multi-agent architecture** to process queries.
 
-### Queries
-- `POST /api/queries/process/` - Process natural language query
-- `GET /api/queries/history/` - Get query history
+### Agent Flow
 
-## Connecting Platforms
+1. **Request Handler**
+
+   * Receives user query from frontend
+
+2. **Agent 1 – Classifier**
+
+   * Detects target platform (Stripe / Zoho / GitHub)
+   * Uses AI with keyword fallback
+
+3. **Agent 2 – Planner**
+
+   * Converts query into API actions & filters
+   * Example:
+
+     ```json
+     {
+       "action": "list_deals",
+       "filters": {
+         "amount_gt": 10000
+       }
+     }
+     ```
+
+4. **Agent 3 – Fetcher**
+
+   * Calls platform APIs
+   * Handles pagination and retries
+
+5. **Agent 4 – Analyst**
+
+   * Determines if visualization is needed
+   * Prepares chart data (Bar, Line, Doughnut)
+
+6. **Agent 5 – Summarizer**
+
+   * Generates human-readable explanation
+   * Uses AI only for summarization
+
+---
+
+## 🤖 OpenAI / Gemini Usage
+
+* **Model**: `gpt-4o-mini`
+* Used for:
+
+  * Platform detection
+  * Query interpretation
+  * Result summarization
+
+📌 **Security Note**
+User credentials are **never shared** with OpenAI or Gemini.
+
+---
+
+## 📂 Project Structure
+
+```text
+frontend/
+ ├── index.html
+ ├── style.css
+ └── app.js
+
+backend/
+ ├── manage.py
+ ├── project_name/
+ │   ├── settings.py
+ │   └── urls.py
+ └── app/
+     ├── views.py
+     ├── serializers.py
+     └── models.py
+
+agents/
+ ├── ai_agent.py
+ └── workflow.py
+```
+
+---
+
+## ❓ Example Queries
 
 ### Stripe
-1. Get your API key from https://dashboard.stripe.com/apikeys
-2. Use your **Secret Key** (starts with `sk_`)
-3. For testing, use a test mode key (starts with `sk_test_`)
 
-### Zendesk
-1. Format: `subdomain:email:api_token`
-2. Get your API token from Admin > Channels > API
-3. Example: `mycompany:admin@company.com:abcd1234token`
+* “Show unpaid invoices”
+* “How much revenue did we make last week?”
+* “List failed charges”
 
-## Environment Variables
+### Zoho CRM
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `SECRET_KEY` | Django secret key | Yes |
-| `DEBUG` | Debug mode (True/False) | No |
-| `OPENAI_API_KEY` | Your OpenAI API key | Yes |
-| `ENCRYPTION_KEY` | Fernet key for API encryption | Yes |
-| `CORS_ALLOWED_ORIGINS` | Allowed frontend origins | No |
-| `ALLOWED_HOSTS` | Allowed hosts | No |
+* “Show won deals over 10k”
+* “List contacts from Mumbai”
+* “Breakdown deals by stage” *(Doughnut chart)*
 
-## Security Features
+### GitHub
 
-- **JWT Authentication**: Short-lived access tokens (60 min)
-- **API Key Encryption**: Fernet symmetric encryption at rest
-- **CORS Protection**: Configured for specific origins only
-- **Rate Limiting**: Prevents abuse
-- **Input Validation**: All inputs validated and sanitized
+* “Summarize facebook/react repository”
+* “Show open pull requests”
+* “List recent commits”
 
-## Example Queries
+---
 
-### Stripe
-- "Show unpaid invoices"
-- "Revenue this month"
-- "List active subscriptions"
-- "Customer growth last week"
+## 📦 Demo & Output
 
-### Zendesk
-- "List open tickets"
-- "Average resolution time"
-- "High priority tickets"
-- "Search for billing issues"
+🎥 **Project Demo Videos**
+[https://drive.google.com/drive/folders/1_h3QJw6ZSBbwxnYO4mf__wsdwwz0V49a](https://drive.google.com/drive/folders/1_h3QJw6ZSBbwxnYO4mf__wsdwwz0V49a)
 
-## Development
+---
 
-### Running Tests
+## 📤 Pushing to GitHub
+
 ```bash
-cd backend
-python manage.py test
+git init
+git add .
+git commit -m "Initial commit: DataBridge AI chat interface"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/REPO_NAME.git
+git push -u origin main
 ```
 
-### CORS Configuration
-Update `CORS_ALLOWED_ORIGINS` in `.env` to include your frontend URL.
+🔑 Use **GitHub PAT** as password when prompted.
 
-## License
+---
 
-MIT
+## ✅ Conclusion
 
+DataBridge AI demonstrates:
 
-Instructions for the creating python pip module
-You are a senior Python architect and Django package author.
+* Secure API integration
+* Multi-step AI reasoning
+* Real-world backend workflows
+* Scalable, platform-agnostic architecture
 
-Your task is to design a reusable, pip-installable Django REST Framework backend
-called `ai-data-platform`.
+The project is designed to be **extensible**, **secure**, and **production-ready**.
 
-This package must allow anyone to install it via pip and instantly get a
-fully working AI-driven backend for querying third-party platforms
-(Stripe, GitHub, Zendesk).
+---
 
-### REQUIREMENTS
-
-1. The package must be installable via:
-   pip install ai-data-platform
-
-2. It must expose a Django app that can be added to INSTALLED_APPS.
-
-3. The package must include:
-   - Django models
-   - DRF serializers
-   - API views
-   - URL routing
-   - Migrations
-   - Service layers for Stripe, GitHub, Zendesk
-   - AI layer using OpenAI + optional LangGraph
-
-4. Database:
-   - Use Django ORM
-   - Provide migrations
-   - Support SQLite by default
-   - No hardcoded data
-
-5. APIs to expose:
-   - POST /api/login
-   - POST /api/connect-platform
-   - POST /api/query
-
-6. Security:
-   - Encrypt stored credentials
-   - Never send credentials to OpenAI
-   - Token-based authentication
-
-7. Configuration:
-   - Provide default settings via settings_defaults.py
-   - Allow override from project settings
-   - Read API keys from environment variables
-
-8. Provide management commands:
-   - init_platform (initial setup)
-   - create_demo_data (optional)
-
-9. The package must be modular:
-   - Platforms can be enabled/disabled
-   - AI provider can be swapped
-
-10. Output required:
-    - Folder structure
-    - Key files
-    - Example settings.py integration
-    - Example usage instructions
+**Author:** Sai Phapale
+**Project:** DataBridge AI
